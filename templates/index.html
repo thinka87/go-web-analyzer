@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Web Page Analyzer</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; }
+    form { display: flex; gap: .5rem; }
+    input[type=text] { flex: 1; padding: .6rem .8rem; font-size: 1rem; }
+    button { padding: .6rem 1rem; font-size: 1rem; cursor: pointer; }
+    .hint { color: #555; margin-top: .5rem; }
+  </style>
+</head>
+<body>
+  <h1>Web Page Analyzer</h1>
+  <form method="POST" action="/analyze">
+    <input type="text" name="url" placeholder="https://example.com" required />
+    <button type="submit">Analyze</button>
+  </form>
+  <p class="hint">Enter a full URL (scheme optional; we'll assume https).</p>
+</body>
+</html>

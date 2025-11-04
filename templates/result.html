@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Results</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; }
+    a { text-decoration: none; }
+    .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .card { border: 1px solid #e5e7eb; border-radius: .75rem; padding: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+    .muted { color:#555;}
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding:.4rem .3rem; border-bottom:1px solid #eee; text-align:left; }
+    .error { background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:1rem; border-radius:.75rem; }
+  </style>
+</head>
+<body>
+  <a href="/">&larr; New analysis</a>
+  <h1>Results for {{.URL}}</h1>
+
+  {{if .HadError}}
+    <div class="error">
+      <strong>Error:</strong> {{.ErrorMessage}} (HTTP {{.StatusCode}})
+    </div>
+  {{else}}
+  <div class="grid">
+    <div class="card">
+      <h3>HTML Version</h3>
+      <p>{{.HTMLVersion}}</p>
+    </div>
+    <div class="card">
+      <h3>Page Title</h3>
+      <p class="muted">{{.Title}}</p>
+    </div>
+    <div class="card">
+      <h3>Links</h3>
+      <table>
+        <tr><th>Internal</th><td>{{.Links.Internal}}</td></tr>
+        <tr><th>External</th><td>{{.Links.External}}</td></tr>
+        <tr><th>Total</th><td>{{.Links.Total}}</td></tr>
+        <tr><th>Inaccessible</th><td>{{.Inaccessible}}</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Login Form</h3>
+      <p>{{if .HasLoginForm}}Yes{{else}}No{{end}}</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <h3>Headings</h3>
+    <table>
+      <tr><th>H1</th><td>{{index .Headings "h1"}}</td></tr>
+      <tr><th>H2</th><td>{{index .Headings "h2"}}</td></tr>
+      <tr><th>H3</th><td>{{index .Headings "h3"}}</td></tr>
+      <tr><th>H4</th><td>{{index .Headings "h4"}}</td></tr>
+      <tr><th>H5</th><td>{{index .Headings "h5"}}</td></tr>
+      <tr><th>H6</th><td>{{index .Headings "h6"}}</td></tr>
+    </table>
+  </div>
+  {{end}}
+</body>
+</html>
