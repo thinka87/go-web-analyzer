@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log/slog"
 	"net/http"
 	"net/url"
 	"strings"
@@ -94,8 +93,7 @@ func AnalyzeURL(ctx context.Context, raw string) (*AnalyzeResult, error) {
 		Title:       strings.TrimSpace(doc.Find("title").First().Text()),
 		Headings:    countHeadings(doc),
 	}
-	host := req.URL.Hostname()
-
+	
 	internal, external, allLinks := classifyLinks(doc, req.URL)
 	result.Links = LinkSummary{Internal: internal, External: external, Total: internal + external}
 
@@ -131,7 +129,6 @@ func detectHTMLVersion(root *html.Node) string {
 	// html.Parse gives us the Document node; the doctype is a child of it.
 	for n := root.FirstChild; n != nil; n = n.NextSibling {
 		if n.Type == html.DoctypeNode {
-			publicID := "" // n.Attr doesn't include public id directly; we can inspect Data for "html"
 			// The go net/html DoctypeNode stores Data (e.g., "html"); public/system ids are not exposed.
 			// We'll infer: if Doctype present -> HTML5 unless we later extend with tokenizer peeking.
 			return "HTML5 (with doctype)"
