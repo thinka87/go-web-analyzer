@@ -52,12 +52,15 @@ func AnalyzeURL(ctx context.Context, raw string) (*AnalyzeResult, error) {
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, parsed, nil)
 	if err != nil {
-	    return nil, &AnalyzeError{Err: err}
+		return nil, &AnalyzeError{Err: err}
 	}
+
+	// Pretend to be a normal browser to avoid 403s from some WAF/CDN setups.
 	req.Header.Set("User-Agent",
-	    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "+
-	    "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
-	// custom client with timeout and redirect limit
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "+
+			"(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
+
+	// Conservative client with timeout and redirect limit
 	client := &http.Client{
 		Timeout: 15 * time.Second,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -67,6 +70,7 @@ func AnalyzeURL(ctx context.Context, raw string) (*AnalyzeResult, error) {
 			return nil
 		},
 	}
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, &AnalyzeError{Err: err}
@@ -75,13 +79,17 @@ func AnalyzeURL(ctx context.Context, raw string) (*AnalyzeResult, error) {
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 400 {
 		b, _ := io.ReadAll(io.LimitReader(resp.Body, 1024))
-		return nil, &AnalyzeError{StatusCode: resp.StatusCode, Err: fmt.Errorf("%s", strings.TrimSpace(string(b)))}
+		return nil, &AnalyzeError{
+			StatusCode: resp.StatusCode,
+			Err:        fmt.Errorf("%s", strings.TrimSpace(string(b))),
+		}
 	}
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, &AnalyzeError{Err: err}
 	}
+
 	rootNode, err := html.Parse(strings.NewReader(string(bodyBytes)))
 	if err != nil {
 		return nil, &AnalyzeError{Err: err}
@@ -96,11 +104,11 @@ func AnalyzeURL(ctx context.Context, raw string) (*AnalyzeResult, error) {
 		Title:       strings.TrimSpace(doc.Find("title").First().Text()),
 		Headings:    countHeadings(doc),
 	}
-	
-	internal, external, allLinks := classifyLinks(doc, req.URL)
-	result.Links = LinkSummary{Internal: internal, External: external, Total: internal + external}
 
-	// Check accessibility of links with limited concurrency
+	// Classify links and check accessibility
+	_, _, allLinks := classifyLinks(doc, resp.Request.URL)
+	result.Links.Internal, result.Links.External, _ = classifyLinks(doc, resp.Request.URL)
+	result.Links.Total = result.Links.Internal + result.Links.External
 	result.Inaccessible = checkLinksAccessibility(ctx, allLinks, 10)
 
 	// Detect login form
@@ -108,6 +116,7 @@ func AnalyzeURL(ctx context.Context, raw string) (*AnalyzeResult, error) {
 
 	return result, nil
 }
+
 
 func normalizeURL(raw string) (string, error) {
 	raw = strings.TrimSpace(raw)
