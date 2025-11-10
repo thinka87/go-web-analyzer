@@ -52,8 +52,11 @@ func AnalyzeURL(ctx context.Context, raw string) (*AnalyzeResult, error) {
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, parsed, nil)
 	if err != nil {
-		return nil, &AnalyzeError{Err: err}
+	    return nil, &AnalyzeError{Err: err}
 	}
+	req.Header.Set("User-Agent",
+	    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "+
+	    "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
 	// custom client with timeout and redirect limit
 	client := &http.Client{
 		Timeout: 15 * time.Second,
