@@ -49,16 +49,29 @@
   </div>
 
   <div class="card" style="margin-top:1rem;">
-    <h3>Headings</h3>
-    <table>
-      <tr><th>H1</th><td>{{index .Headings "h1"}}</td></tr>
-      <tr><th>H2</th><td>{{index .Headings "h2"}}</td></tr>
-      <tr><th>H3</th><td>{{index .Headings "h3"}}</td></tr>
-      <tr><th>H4</th><td>{{index .Headings "h4"}}</td></tr>
-      <tr><th>H5</th><td>{{index .Headings "h5"}}</td></tr>
-      <tr><th>H6</th><td>{{index .Headings "h6"}}</td></tr>
-    </table>
+  <h3>Headings</h3>
+  <div style="display:flex; flex-wrap:wrap; gap:0.8rem;">
+    <div style="background:#f3f4f6; padding:0.6rem 1rem; border-radius:0.5rem;">
+      <strong>H1:</strong> {{index .Headings "h1"}}
+    </div>
+    <div style="background:#f3f4f6; padding:0.6rem 1rem; border-radius:0.5rem;">
+      <strong>H2:</strong> {{index .Headings "h2"}}
+    </div>
+    <div style="background:#f3f4f6; padding:0.6rem 1rem; border-radius:0.5rem;">
+      <strong>H3:</strong> {{index .Headings "h3"}}
+    </div>
+    <div style="background:#f3f4f6; padding:0.6rem 1rem; border-radius:0.5rem;">
+      <strong>H4:</strong> {{index .Headings "h4"}}
+    </div>
+    <div style="background:#f3f4f6; padding:0.6rem 1rem; border-radius:0.5rem;">
+      <strong>H5:</strong> {{index .Headings "h5"}}
+    </div>
+    <div style="background:#f3f4f6; padding:0.6rem 1rem; border-radius:0.5rem;">
+      <strong>H6:</strong> {{index .Headings "h6"}}
+    </div>
   </div>
+</div>
+
   {{end}}
 </body>
 </html>
